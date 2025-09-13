@@ -173,14 +173,7 @@
                 
                 <div id="comments-list" class="space-y-4">
                     <!-- Les commentaires seront ajoutés ici par JavaScript -->
-                    <div class="card p-4">
-                        <p class="text-sm text-gray-500 mb-1">
-                            <span class="font-bold text-gray-700">Un client satisfait</span> - 13 Septembre 2025
-                        </p>
-                        <p class="text-gray-800">
-                            "Le shampoing est fantastique ! Il a rendu ma peau très douce, et l'odeur est agréable."
-                        </p>
-                    </div>
+                    <p class="text-center text-gray-500">Chargement des commentaires...</p>
                 </div>
             </div>
         </section>
@@ -264,166 +257,228 @@
         </div>
     </div>
 
-    <script>
-        // Met à jour l'année dans le pied de page
-        document.getElementById('current-year').textContent = new Date().getFullYear();
+    <!-- Firebase SDK (MANDATORY pour les apps Firestore) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Gestion du défilement fluide pour les liens de navigation
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
-            });
-        });
-
-        // =======================================================================
-        // LOGIQUE DU PANIER D'ACHAT
-        // =======================================================================
-        let cart = [];
-        const cartCountEl = document.getElementById('cart-count');
-        const cartModal = document.getElementById('cart-modal');
-        const cartItemsList = document.getElementById('cart-items');
-        const cartTotalEl = document.getElementById('cart-total');
-        const messageModal = document.getElementById('message-modal');
-        const messageTextEl = document.getElementById('message-text');
-
-        // Ouvre la modale du panier
-        document.getElementById('cart-button').addEventListener('click', () => {
-            renderCart();
-            cartModal.style.display = 'flex';
-        });
-
-        // Ferme les modales
-        document.getElementById('close-cart-modal').addEventListener('click', () => {
-            cartModal.style.display = 'none';
-        });
-        document.getElementById('close-message-modal').addEventListener('click', () => {
-            messageModal.style.display = 'none';
-        });
-
-        // Ajoute un produit au panier
-        document.querySelectorAll('.btn-primary[data-name]').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const name = e.target.dataset.name;
-                const price = parseInt(e.target.dataset.price);
-
-                const existingItem = cart.find(item => item.name === name);
-                if (existingItem) {
-                    existingItem.quantity++;
-                } else {
-                    cart.push({ name, price, quantity: 1 });
-                }
-                updateCartCount();
-                showMessage(`"${name}" a été ajouté au panier !`);
-            });
-        });
-
-        // Affiche un message personnalisé (remplace alert)
-        function showMessage(text) {
-            messageTextEl.textContent = text;
-            messageModal.style.display = 'flex';
-        }
-
-        // Met à jour le nombre d'articles dans l'icône du panier
-        function updateCartCount() {
-            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-            cartCountEl.textContent = totalItems;
-        }
-
-        // Affiche les articles du panier
-        function renderCart() {
-            cartItemsList.innerHTML = '';
-            let total = 0;
-            if (cart.length === 0) {
-                cartItemsList.innerHTML = '<li class="text-center text-gray-500">Votre panier est vide.</li>';
-            } else {
-                cart.forEach((item, index) => {
-                    const li = document.createElement('li');
-                    li.classList.add('flex', 'justify-between', 'items-center');
-                    li.innerHTML = `
-                        <span>${item.name} (${item.quantity}x)</span>
-                        <span class="font-bold">${item.price * item.quantity} GNF</span>
-                    `;
-                    cartItemsList.appendChild(li);
-                    total += item.price * item.quantity;
-                });
-            }
-            cartTotalEl.textContent = `${total} GNF`;
-        }
-
-        // Gère la commande
-        document.getElementById('checkout-button').addEventListener('click', () => {
-            if (cart.length === 0) {
-                showMessage("Votre panier est vide. Veuillez ajouter des articles pour passer une commande.");
-                return;
-            }
-            
-            let orderSummary = "Commande:\n\n";
-            let total = 0;
-            cart.forEach(item => {
-                orderSummary += `- ${item.name} x${item.quantity} (${item.price * item.quantity} GNF)\n`;
-                total += item.price * item.quantity;
-            });
-            orderSummary += `\nTotal: ${total} GNF`;
-            
-            // Note: C'est une simulation. Pour envoyer un vrai email,
-            // vous auriez besoin d'un service de backend.
-            showMessage("Votre commande a été traitée. Un email avec le récapitulatif a été envoyé à l'adresse Iladjakomakoivogui@gmaill.com. Vous pouvez aussi nous contacter via WhatsApp.");
-            console.log(orderSummary); // Pour voir la commande dans la console
-            cart = []; // Vide le panier après la commande
-            updateCartCount();
-            cartModal.style.display = 'none';
-        });
-
-        // =======================================================================
-        // LOGIQUE DES COMMENTAIRES
-        // =======================================================================
-        const commentForm = document.getElementById('comment-form');
-        const commentsList = document.getElementById('comments-list');
-
-        commentForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const name = document.getElementById('comment-name').value;
-            const text = document.getElementById('comment-text').value;
-            const now = new Date();
-            const date = `${now.getDate()} ${now.toLocaleString('fr-FR', { month: 'long' })} ${now.getFullYear()}`;
-            
-            addCommentToDOM(name, text, date);
-            showMessage("Merci pour votre commentaire !");
-            commentForm.reset();
-        });
-
-        function addCommentToDOM(name, text, date) {
-            const commentEl = document.createElement('div');
-            commentEl.classList.add('card', 'p-4');
-            commentEl.innerHTML = `
-                <p class="text-sm text-gray-500 mb-1">
-                    <span class="font-bold text-gray-700">${name}</span> - ${date}
-                </p>
-                <p class="text-gray-800">${text}</p>
-            `;
-            // Ajoute le nouveau commentaire en haut de la liste
-            commentsList.prepend(commentEl);
-        }
+        // Variables globales (MANDATORY)
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
         
-        // =======================================================================
-        // LOGIQUE DU FORMULAIRE DE CONTACT (simulation d'envoi d'email)
-        // =======================================================================
-        const contactForm = document.getElementById('contact-form');
-        contactForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const name = document.getElementById('contact-name').value;
-            const email = document.getElementById('contact-email').value;
-            const message = document.getElementById('contact-message').value;
+        // Initialisation de Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-            // Note: Pour envoyer un vrai email, vous auriez besoin d'un service de backend
-            // et de l'adresse email de votre partenaire. C'est une simulation.
-            showMessage(`Merci ${name}, votre message a été envoyé ! Nous vous contacterons à l'adresse ${email}.`);
-            contactForm.reset();
+        // Authentification de l'utilisateur
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // Utilisateur connecté, nous pouvons utiliser le site
+                console.log("Authentification réussie pour l'utilisateur:", user.uid);
+                setupApp(user.uid);
+            } else {
+                // Pas encore de connexion, on tente la connexion anonyme ou avec le token
+                try {
+                    if (initialAuthToken) {
+                        await signInWithCustomToken(auth, initialAuthToken);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                } catch (error) {
+                    console.error("Erreur d'authentification:", error);
+                    showMessage("Erreur lors de la connexion. Veuillez rafraîchir la page.");
+                }
+            }
         });
 
+        function setupApp(userId) {
+            // Affichage de l'ID utilisateur sur la console (pour le débogage)
+            console.log("ID utilisateur:", userId);
+
+            // =======================================================================
+            // LOGIQUE DU PANIER D'ACHAT (reste inchangée)
+            // =======================================================================
+            let cart = [];
+            const cartCountEl = document.getElementById('cart-count');
+            const cartModal = document.getElementById('cart-modal');
+            const cartItemsList = document.getElementById('cart-items');
+            const cartTotalEl = document.getElementById('cart-total');
+            const messageModal = document.getElementById('message-modal');
+            const messageTextEl = document.getElementById('message-text');
+            
+            // Met à jour l'année dans le pied de page
+            document.getElementById('current-year').textContent = new Date().getFullYear();
+
+            // Gestion du défilement fluide pour les liens de navigation
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // Ouvre la modale du panier
+            document.getElementById('cart-button').addEventListener('click', () => {
+                renderCart();
+                cartModal.style.display = 'flex';
+            });
+
+            // Ferme les modales
+            document.getElementById('close-cart-modal').addEventListener('click', () => {
+                cartModal.style.display = 'none';
+            });
+            document.getElementById('close-message-modal').addEventListener('click', () => {
+                messageModal.style.display = 'none';
+            });
+
+            // Ajoute un produit au panier
+            document.querySelectorAll('.btn-primary[data-name]').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const name = e.target.dataset.name;
+                    const price = parseInt(e.target.dataset.price);
+                    const existingItem = cart.find(item => item.name === name);
+                    if (existingItem) {
+                        existingItem.quantity++;
+                    } else {
+                        cart.push({ name, price, quantity: 1 });
+                    }
+                    updateCartCount();
+                    showMessage(`"${name}" a été ajouté au panier !`);
+                });
+            });
+
+            // Affiche un message personnalisé (remplace alert)
+            function showMessage(text) {
+                messageTextEl.textContent = text;
+                messageModal.style.display = 'flex';
+            }
+
+            // Met à jour le nombre d'articles dans l'icône du panier
+            function updateCartCount() {
+                const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+                cartCountEl.textContent = totalItems;
+            }
+
+            // Affiche les articles du panier
+            function renderCart() {
+                cartItemsList.innerHTML = '';
+                let total = 0;
+                if (cart.length === 0) {
+                    cartItemsList.innerHTML = '<li class="text-center text-gray-500">Votre panier est vide.</li>';
+                } else {
+                    cart.forEach((item, index) => {
+                        const li = document.createElement('li');
+                        li.classList.add('flex', 'justify-between', 'items-center');
+                        li.innerHTML = `
+                            <span>${item.name} (${item.quantity}x)</span>
+                            <span class="font-bold">${item.price * item.quantity} GNF</span>
+                        `;
+                        cartItemsList.appendChild(li);
+                        total += item.price * item.quantity;
+                    });
+                }
+                cartTotalEl.textContent = `${total} GNF`;
+            }
+
+            // Gère la commande
+            document.getElementById('checkout-button').addEventListener('click', () => {
+                if (cart.length === 0) {
+                    showMessage("Votre panier est vide. Veuillez ajouter des articles pour passer une commande.");
+                    return;
+                }
+                showMessage("Votre commande a été traitée. Un email avec le récapitulatif a été envoyé à l'adresse Iladjakomakoivogui@gmaill.com. Vous pouvez aussi nous contacter via WhatsApp.");
+                cart = [];
+                updateCartCount();
+                cartModal.style.display = 'none';
+            });
+
+
+            // =======================================================================
+            // LOGIQUE DES COMMENTAIRES AVEC FIREBASE
+            // =======================================================================
+            const commentForm = document.getElementById('comment-form');
+            const commentsList = document.getElementById('comments-list');
+            const commentsCollection = collection(db, `/artifacts/${appId}/public/data/comments`);
+
+            // Écoute des changements en temps réel
+            const q = query(commentsCollection);
+            onSnapshot(q, (querySnapshot) => {
+                commentsList.innerHTML = '';
+                if (querySnapshot.empty) {
+                    commentsList.innerHTML = '<p class="text-center text-gray-500">Aucun commentaire pour le moment. Soyez le premier !</p>';
+                } else {
+                    querySnapshot.forEach((doc) => {
+                        const commentData = doc.data();
+                        addCommentToDOM(commentData.name, commentData.text, commentData.date, commentData.timestamp);
+                    });
+                }
+            });
+
+            commentForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const name = document.getElementById('comment-name').value;
+                const text = document.getElementById('comment-text').value;
+
+                try {
+                    await addDoc(commentsCollection, {
+                        name: name,
+                        text: text,
+                        date: new Date().toLocaleDateString('fr-FR'),
+                        timestamp: serverTimestamp()
+                    });
+                    showMessage("Merci pour votre commentaire !");
+                    commentForm.reset();
+                } catch (e) {
+                    console.error("Erreur lors de l'ajout du commentaire:", e);
+                    showMessage("Erreur lors de l'envoi du commentaire. Veuillez réessayer.");
+                }
+            });
+
+            function addCommentToDOM(name, text, date, timestamp) {
+                const commentEl = document.createElement('div');
+                commentEl.classList.add('card', 'p-4');
+                const formattedDate = date; // La date est déjà formatée
+                commentEl.innerHTML = `
+                    <p class="text-sm text-gray-500 mb-1">
+                        <span class="font-bold text-gray-700">${name}</span> - ${formattedDate}
+                    </p>
+                    <p class="text-gray-800">${text}</p>
+                `;
+                commentsList.prepend(commentEl);
+            }
+            
+            // =======================================================================
+            // LOGIQUE DU FORMULAIRE DE CONTACT AVEC FIREBASE
+            // =======================================================================
+            const contactForm = document.getElementById('contact-form');
+            const contactsCollection = collection(db, `/artifacts/${appId}/public/data/contacts`);
+
+            contactForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const name = document.getElementById('contact-name').value;
+                const email = document.getElementById('contact-email').value;
+                const message = document.getElementById('contact-message').value;
+
+                try {
+                    await addDoc(contactsCollection, {
+                        name: name,
+                        email: email,
+                        message: message,
+                        timestamp: serverTimestamp()
+                    });
+                    showMessage(`Merci ${name}, votre message a été envoyé ! Nous vous contacterons à l'adresse ${email}.`);
+                    contactForm.reset();
+                } catch (e) {
+                    console.error("Erreur lors de l'envoi du message de contact:", e);
+                    showMessage("Erreur lors de l'envoi du message. Veuillez réessayer.");
+                }
+            });
+        }
     </script>
 </body>
 </html>

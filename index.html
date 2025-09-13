@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boutique - KADILA</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7fafc;
+        }
+        .section-padding {
+            padding: 4rem 1rem;
+        }
+        .card {
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            padding: 2.5rem;
+        }
+        .card-service {
+            transition: transform 0.3s ease;
+        }
+        .card-service:hover {
+            transform: translateY(-5px);
+        }
+        .product-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .btn-primary {
+            @apply bg-indigo-600 text-white font-semibold py-3 px-8 rounded-full shadow-lg hover:bg-indigo-700 transition-all duration-300;
+        }
+        .btn-secondary {
+            @apply bg-gray-200 text-gray-800 font-semibold py-2 px-6 rounded-full hover:bg-gray-300 transition-all duration-200;
+        }
+        .cart-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            justify-content: center;
+            align-items: center;
+        }
+        .cart-content {
+            background-color: #fefefe;
+            padding: 2rem;
+            border-radius: 1rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- En-tête et Navigation -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="#" class="flex items-center space-x-2 text-xl font-bold text-indigo-600 rounded-md p-2">
+                <!-- Nouveau logo KADILA -->
+                <img src="https://placehold.co/60x60/FFFFFF/08855F?text=KADILA+Logo" alt="Logo KADILA" class="h-10 w-10">
+                <span class="hidden md:inline">KADILA</span>
+            </a>
+            <div class="flex items-center space-x-6">
+                <a href="#accueil" class="text-gray-600 hover:text-indigo-600 transition-colors duration-200 p-2 rounded-md">Accueil</a>
+                <a href="#produits" class="text-gray-600 hover:text-indigo-600 transition-colors duration-200 p-2 rounded-md">Produits</a>
+                <a href="#commentaires" class="text-gray-600 hover:text-indigo-600 transition-colors duration-200 p-2 rounded-md">Avis Clients</a>
+                <a href="#contact" class="text-gray-600 hover:text-indigo-600 transition-colors duration-200 p-2 rounded-md">Contact</a>
+                <button id="cart-button" class="relative text-gray-600 hover:text-indigo-600 transition-colors duration-200 p-2 rounded-md">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.183 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    <span id="cart-count" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">0</span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Section d'Accueil (Héro) - Mise à jour avec un fond clair pour correspondre au logo -->
+        <section id="accueil" class="relative bg-gray-100 text-gray-800 section-padding">
+            <div class="container mx-auto px-6 py-20 text-center relative z-10">
+                <h1 class="text-4xl md:text-6xl font-extrabold leading-tight tracking-tight mb-4">
+                    La solution pour votre bien-être et votre maison.
+                </h1>
+                <p class="text-lg md:text-xl max-w-2xl mx-auto mb-8 text-gray-600">
+                    Découvrez nos produits de lavage de haute qualité.
+                </p>
+                <a href="#produits" class="btn-primary">Découvrir les produits</a>
+            </div>
+        </section>
+
+        <!-- Section Produits -->
+        <section id="produits" class="section-padding">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">Nos Produits phares</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto mb-12">
+                    Des produits conçus avec soin pour prendre soin de vous et de votre environnement.
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Produit 1 : Shampoing de toilette -->
+                    <div class="card product-card">
+                        <img src="https://placehold.co/400x400/8B5CF6/FFFFFF?text=Shampoing+Toilette" alt="Image du Shampoing de toilette" class="w-full rounded-lg mb-4">
+                        <h3 class="text-2xl font-semibold mb-2">Shampoing de Toilette</h3>
+                        <p class="text-gray-600 mb-4">
+                            Un shampoing doux et efficace pour le lavage corporel.
+                            <br>
+                            <span class="font-bold text-lg text-indigo-600">15 000 GNF</span>
+                        </p>
+                        <p class="text-left text-gray-700 mb-6">
+                            Ce shampoing est différent des autres. Sa formule spéciale est douce pour la peau,
+                            ce qui le rend idéal pour les peaux sensibles. Il ne contient pas de produits chimiques agressifs et
+                            laisse une sensation de propreté et de fraîcheur sans dessécher la peau. C'est le choix parfait pour
+                            ceux qui recherchent à la fois l'efficacité et le respect de la peau.
+                        </p>
+                        <button class="btn-primary w-full" data-name="Shampoing de Toilette" data-price="15000">Ajouter au panier</button>
+                    </div>
+
+                    <!-- Produit 2 : Shampoing de ménage -->
+                    <div class="card product-card">
+                        <img src="https://placehold.co/400x400/60A5FA/FFFFFF?text=Shampoing+Ménage" alt="Image du Shampoing de ménage" class="w-full rounded-lg mb-4">
+                        <h3 class="text-2xl font-semibold mb-2">Shampoing de Ménage</h3>
+                        <p class="text-gray-600 mb-4">
+                            Un shampoing puissant pour toutes vos tâches de nettoyage à la maison.
+                            <br>
+                            <span class="font-bold text-lg text-indigo-600">20 000 GNF</span>
+                        </p>
+                        <p class="text-left text-gray-700 mb-6">
+                           Ce shampoing est spécialement conçu pour un nettoyage en profondeur. Sa formule concentrée dissout la saleté et la graisse, laissant les surfaces impeccables. Idéal pour les sols, les murs, la vaisselle et plus encore, il offre une efficacité de nettoyage supérieure sans endommager les surfaces.
+                        </p>
+                        <button class="btn-primary w-full" data-name="Shampoing de Ménage" data-price="20000">Ajouter au panier</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section Commentaires -->
+        <section id="commentaires" class="section-padding bg-gray-100">
+            <div class="container mx-auto px-6 max-w-3xl">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">Avis Clients</h2>
+                <p class="text-gray-600 text-center mb-12">
+                    Partagez votre expérience avec nos produits. Vos commentaires nous aident à nous améliorer !
+                </p>
+                <div class="card mb-8">
+                    <form id="comment-form" class="space-y-6">
+                        <div>
+                            <label for="comment-name" class="block text-sm font-medium text-gray-700">Votre Nom</label>
+                            <input type="text" id="comment-name" name="comment-name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2" required>
+                        </div>
+                        <div>
+                            <label for="comment-text" class="block text-sm font-medium text-gray-700">Votre Commentaire</label>
+                            <textarea id="comment-text" name="comment-text" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2" required></textarea>
+                        </div>
+                        <div>
+                            <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
+                                Poster le commentaire
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div id="comments-list" class="space-y-4">
+                    <!-- Les commentaires seront ajoutés ici par JavaScript -->
+                    <div class="card p-4">
+                        <p class="text-sm text-gray-500 mb-1">
+                            <span class="font-bold text-gray-700">Un client satisfait</span> - 13 Septembre 2025
+                        </p>
+                        <p class="text-gray-800">
+                            "Le shampoing est fantastique ! Il a rendu ma peau très douce, et l'odeur est agréable."
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section Contact -->
+        <section id="contact" class="section-padding">
+            <div class="container mx-auto px-6 max-w-3xl">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">Contactez-nous</h2>
+                <p class="text-gray-600 text-center mb-12">
+                    Pour toute question ou commande spéciale, utilisez les contacts ci-dessous ou le formulaire.
+                </p>
+                <div class="card mb-8 text-center">
+                    <p class="text-lg mb-2">
+                        <span class="font-semibold text-indigo-600">E-mail:</span>
+                        <a href="mailto:Iladjakomakoivogui@gmaill.com" class="text-gray-700 hover:underline">Iladjakomakoivogui@gmaill.com</a>
+                    </p>
+                    <p class="text-lg">
+                        <span class="font-semibold text-indigo-600">WhatsApp Business:</span>
+                        <a href="https://wa.me/224622748796" target="_blank" class="text-gray-700 hover:underline">622-74-87-96</a>
+                    </p>
+                </div>
+                
+                <div class="card">
+                    <form id="contact-form" class="space-y-6">
+                        <div>
+                            <label for="contact-name" class="block text-sm font-medium text-gray-700">Nom Complet</label>
+                            <input type="text" id="contact-name" name="contact-name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2" required>
+                        </div>
+                        <div>
+                            <label for="contact-email" class="block text-sm font-medium text-gray-700">Adresse Email</label>
+                            <input type="email" id="contact-email" name="contact-email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2" required>
+                        </div>
+                        <div>
+                            <label for="contact-message" class="block text-sm font-medium text-gray-700">Message</label>
+                            <textarea id="contact-message" name="contact-message" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2" required></textarea>
+                        </div>
+                        <div>
+                            <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
+                                Envoyer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Pied de page -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; <span id="current-year"></span> KADILA. Tous droits réservés.</p>
+        </div>
+    </footer>
+
+    <!-- Modale du Panier -->
+    <div id="cart-modal" class="cart-modal">
+        <div class="cart-content">
+            <div class="flex justify-between items-center mb-4 border-b pb-2">
+                <h3 class="text-2xl font-bold">Votre Panier</h3>
+                <button id="close-cart-modal" class="text-gray-600 hover:text-gray-800 transition-colors duration-200 text-2xl">&times;</button>
+            </div>
+            <ul id="cart-items" class="space-y-4 max-h-80 overflow-y-auto mb-4">
+                <!-- Les articles du panier seront ajoutés ici par JavaScript -->
+            </ul>
+            <div class="flex justify-between items-center border-t pt-4">
+                <span class="text-xl font-bold">Total:</span>
+                <span id="cart-total" class="text-xl font-bold">0 GNF</span>
+            </div>
+            <button id="checkout-button" class="btn-primary w-full mt-6">Passer la Commande</button>
+        </div>
+    </div>
+
+    <!-- Modale de message (remplace alert()) -->
+    <div id="message-modal" class="cart-modal">
+        <div class="cart-content">
+            <div class="flex justify-between items-center mb-4 border-b pb-2">
+                <h3 class="text-2xl font-bold">Message</h3>
+                <button id="close-message-modal" class="text-gray-600 hover:text-gray-800 transition-colors duration-200 text-2xl">&times;</button>
+            </div>
+            <p id="message-text" class="text-gray-700 text-center"></p>
+        </div>
+    </div>
+
+    <script>
+        // Met à jour l'année dans le pied de page
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+
+        // Gestion du défilement fluide pour les liens de navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // =======================================================================
+        // LOGIQUE DU PANIER D'ACHAT
+        // =======================================================================
+        let cart = [];
+        const cartCountEl = document.getElementById('cart-count');
+        const cartModal = document.getElementById('cart-modal');
+        const cartItemsList = document.getElementById('cart-items');
+        const cartTotalEl = document.getElementById('cart-total');
+        const messageModal = document.getElementById('message-modal');
+        const messageTextEl = document.getElementById('message-text');
+
+        // Ouvre la modale du panier
+        document.getElementById('cart-button').addEventListener('click', () => {
+            renderCart();
+            cartModal.style.display = 'flex';
+        });
+
+        // Ferme les modales
+        document.getElementById('close-cart-modal').addEventListener('click', () => {
+            cartModal.style.display = 'none';
+        });
+        document.getElementById('close-message-modal').addEventListener('click', () => {
+            messageModal.style.display = 'none';
+        });
+
+        // Ajoute un produit au panier
+        document.querySelectorAll('.btn-primary[data-name]').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const name = e.target.dataset.name;
+                const price = parseInt(e.target.dataset.price);
+
+                const existingItem = cart.find(item => item.name === name);
+                if (existingItem) {
+                    existingItem.quantity++;
+                } else {
+                    cart.push({ name, price, quantity: 1 });
+                }
+                updateCartCount();
+                showMessage(`"${name}" a été ajouté au panier !`);
+            });
+        });
+
+        // Affiche un message personnalisé (remplace alert)
+        function showMessage(text) {
+            messageTextEl.textContent = text;
+            messageModal.style.display = 'flex';
+        }
+
+        // Met à jour le nombre d'articles dans l'icône du panier
+        function updateCartCount() {
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCountEl.textContent = totalItems;
+        }
+
+        // Affiche les articles du panier
+        function renderCart() {
+            cartItemsList.innerHTML = '';
+            let total = 0;
+            if (cart.length === 0) {
+                cartItemsList.innerHTML = '<li class="text-center text-gray-500">Votre panier est vide.</li>';
+            } else {
+                cart.forEach((item, index) => {
+                    const li = document.createElement('li');
+                    li.classList.add('flex', 'justify-between', 'items-center');
+                    li.innerHTML = `
+                        <span>${item.name} (${item.quantity}x)</span>
+                        <span class="font-bold">${item.price * item.quantity} GNF</span>
+                    `;
+                    cartItemsList.appendChild(li);
+                    total += item.price * item.quantity;
+                });
+            }
+            cartTotalEl.textContent = `${total} GNF`;
+        }
+
+        // Gère la commande
+        document.getElementById('checkout-button').addEventListener('click', () => {
+            if (cart.length === 0) {
+                showMessage("Votre panier est vide. Veuillez ajouter des articles pour passer une commande.");
+                return;
+            }
+            
+            let orderSummary = "Commande:\n\n";
+            let total = 0;
+            cart.forEach(item => {
+                orderSummary += `- ${item.name} x${item.quantity} (${item.price * item.quantity} GNF)\n`;
+                total += item.price * item.quantity;
+            });
+            orderSummary += `\nTotal: ${total} GNF`;
+            
+            // Note: C'est une simulation. Pour envoyer un vrai email,
+            // vous auriez besoin d'un service de backend.
+            showMessage("Votre commande a été traitée. Un email avec le récapitulatif a été envoyé à l'adresse Iladjakomakoivogui@gmaill.com. Vous pouvez aussi nous contacter via WhatsApp.");
+            console.log(orderSummary); // Pour voir la commande dans la console
+            cart = []; // Vide le panier après la commande
+            updateCartCount();
+            cartModal.style.display = 'none';
+        });
+
+        // =======================================================================
+        // LOGIQUE DES COMMENTAIRES
+        // =======================================================================
+        const commentForm = document.getElementById('comment-form');
+        const commentsList = document.getElementById('comments-list');
+
+        commentForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('comment-name').value;
+            const text = document.getElementById('comment-text').value;
+            const now = new Date();
+            const date = `${now.getDate()} ${now.toLocaleString('fr-FR', { month: 'long' })} ${now.getFullYear()}`;
+            
+            addCommentToDOM(name, text, date);
+            showMessage("Merci pour votre commentaire !");
+            commentForm.reset();
+        });
+
+        function addCommentToDOM(name, text, date) {
+            const commentEl = document.createElement('div');
+            commentEl.classList.add('card', 'p-4');
+            commentEl.innerHTML = `
+                <p class="text-sm text-gray-500 mb-1">
+                    <span class="font-bold text-gray-700">${name}</span> - ${date}
+                </p>
+                <p class="text-gray-800">${text}</p>
+            `;
+            // Ajoute le nouveau commentaire en haut de la liste
+            commentsList.prepend(commentEl);
+        }
+        
+        // =======================================================================
+        // LOGIQUE DU FORMULAIRE DE CONTACT (simulation d'envoi d'email)
+        // =======================================================================
+        const contactForm = document.getElementById('contact-form');
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('contact-name').value;
+            const email = document.getElementById('contact-email').value;
+            const message = document.getElementById('contact-message').value;
+
+            // Note: Pour envoyer un vrai email, vous auriez besoin d'un service de backend
+            // et de l'adresse email de votre partenaire. C'est une simulation.
+            showMessage(`Merci ${name}, votre message a été envoyé ! Nous vous contacterons à l'adresse ${email}.`);
+            contactForm.reset();
+        });
+
+    </script>
+</body>
+</html>
